@@ -1,27 +1,23 @@
 import requests, json
 from bs4 import BeautifulSoup
 
-# Сторінка куди надсилаємо запит
-url = 'https://scrapingclub.com/exercise/list_basic_detail/94766-A/'
+url = 'https://scrapingclub.com/exercise/list_basic/'
 
-# Виконуємо запит до сайту, та записуємо результат
 response = requests.get(url)
 
-# Отримуємо так званий 'суп'
 soup = BeautifulSoup(response.text, 'lxml')
-# Результат
-prices = soup.find_all('h4', class_='my-4 card-price')
 
-products = soup.find_all('h3', class_='card-title')
+prices = soup.find_all('div', class_='p-4', limit=10)
 
-some_data = list()
-for i in range(len(prices)):
-    for product in range(len(products)):
-        some_data.append(products[product].text)
-    some_data.append(prices[i].text)
-    
-print(some_data)
 
-with open('result.json', 'w', encoding='utf8') as file:
-    json.dump(some_data, file)
+my_list = []
+for price in range(len(prices)):
+    my_list.append(prices[price].text)
 
+
+cleaned_product_list = [item.replace('\n', '') for item in my_list]
+
+split_products = [item.split('$') for item in cleaned_product_list]
+
+for product in split_products:
+    print(f'Назва: {product[0]}.', f" Ціна: {product[1]}$")
